@@ -9,9 +9,12 @@ void process_error(){
 }
 
 void print_time(std::string person){
-    time_t now = time(0);
-    char* dt = ctime(&now);
-    fprintf(stdout, "%s: %s", person.c_str(), dt );
+    char *buffer [10];
+    time_t now;
+    time(&now);
+    tm *now_tm = localtime(&now);
+    strftime(*buffer, 10, "%M:%S", now_tm);
+    fprintf(stdout, "%s, %s\n", person.c_str(), *buffer);
 }
 
 
@@ -45,7 +48,8 @@ int main() {
     if(pid[1] > 0){ // Father as second child father
         wait(nullptr);
         sleep(12);
-        print_time("DEATH -> Father");
+        print_time("DEATH -> Father: Lived 60");
+
     }
 
     if(pid[0] == 0){ // First child
@@ -72,23 +76,23 @@ int main() {
 
     if(pid[2] == 0){ // First grandchild
         sleep(12);
-        print_time("DEATH -> First grandchild");
+        print_time("DEATH -> First grandchild: Lived 12");
     }
 
     if(pid[3] == 0){ // Second grandchild
         sleep(18);
-        print_time("DEATH -> Second grandchild");
+        print_time("DEATH -> Second grandchild: Lived 18");
 
     }
 
     if (pid[2] > 0){ // First child as first grandchild father
         sleep(18);
-        print_time("DEATH -> First child");
+        print_time("DEATH -> First child: Lived 30");
     }
 
     if(pid[3] > 0){ // Second child as second grandchild father
         sleep(16);
-        print_time("DEATH -> Second child");
+        print_time("DEATH -> Second child: Lived 30");
         wait(nullptr);
     }
     return 0;
