@@ -3,6 +3,7 @@
 Componentes:
 
 - João Pedro Vieira de Oliveira Limão
+- Júlio César da Costa Morais
 
 ## Executanto
 
