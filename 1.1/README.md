@@ -12,3 +12,6 @@ Para compilar o arquivo, é necessário estar utilizando o sistema operacional L
 ```bash
 g++ main.cpp -o out && ./out
 ``` 
+## Vídeo da execução do algoritmo
+
+- https://drive.google.com/file/d/1eNtXWkIZ2zM27eugnVmeAguIhxkmN8Lo/view
