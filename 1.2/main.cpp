@@ -1,51 +1,50 @@
 #include <iostream>
+#include "pthread.h"
 #include <math.h>
 #define PI 3.14159265358979323846
 
-// First function -> f(x) = 5, x0 = 0 and x = 10
-// Second function -> f(x) = sin(2x) + cos(5x), x0 = 0 and x = 2pi
-
+// Temp vars
+#define NTHREADS 6
+#define NTRAPEZOIDS 120
 
 float area_trapezoid(float B, float b, float h){
     return (h/2)*(B+b);
 }
 
-float f1(float x){
-    return 5.0;
-}
-
+//x0 = 0 and x = 2pi
 float f2(float x){
     return sin(2*x) + cos(5*x);
 }
 
-int main() {
-    int amount_threads = 6;
-    int number_trapezoids = 120;
+// x0 = 0 and x = 10
+float f1(float x){
+    return 5.0;
+}
 
-    // First Function
-    float x0 = 0.0;
-    float x = 10.0;
-    float h = x - x0;
-    float B = f1(x);
-    float b = f1(x0);
-    float result = area_trapezoid(B, b, h);
-    fprintf(stdout, "%.2f\n", result);
+float calc(int trapezoids_per_thread, float x, float x0){
+    float h, sum, B, b;
+    h = (x-x0)/(float)trapezoids_per_thread; sum = 0; B = x0; b = h;
 
-
-    // Second function
-    x = 2*PI;
-    h = (x-x0)/20;
-    float sum = 0;
-
-    float temp_x = h;
-    for(int i=1; i<=20; i++){
-        B = f2(temp_x);
-        b = f2(x0);
-        sum += area_trapezoid(B, b, h);
-        x0 = temp_x;
-        temp_x += h;
+    for(int j=0; j<trapezoids_per_thread; j++){
+        sum += (h/2)*(f1(B)+f1(b));
+        b = B;
+        B += h;
     }
-    fprintf(stdout, "%.2f\n", sum);
+    return sum;
+}
+
+int main() {
+    pthread_t threads[NTHREADS];
+    void* return_thread;
+
+    int trapezoids_per_thread = floor(NTRAPEZOIDS/NTHREADS);
+    int x = ceil(10/6);
+
+    fprintf(stdout, "Test: %i", x);
+
+    for(int i=0; i<NTHREADS; i++){
+
+    }
 
     return 0;
 }
