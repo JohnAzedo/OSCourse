@@ -10,6 +10,6 @@ Componentes:
 Para compilar o arquivo, é necessário estar utilizando o sistema operacional Linux, e  utilizar o compilador g++, com o seguinte comando:
 
 ```bash
-g++ main.cpp -o out && ./out
+g++ main.cpp -o out -pthread && ./out {num_threads} {num_trapezios}
 ``` 
 
