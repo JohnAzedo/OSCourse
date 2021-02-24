@@ -17,9 +17,9 @@ float f1(float x){
     return 5.0;
 }
 
-void split_in_box(int h, int num_threads, int * array){
+void split_in_box(int num_trapezoids, int num_threads, int * array){
     int index = 0;
-    for(int i=0; i<h; i++){
+    for(int i=0; i<num_trapezoids; i++){
         if(index==num_threads){
             index = 0;
         }
