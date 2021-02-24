@@ -41,6 +41,8 @@ struct Arguments {
 
 void * in_thread(void* arguments){
     auto *args = (Arguments *) arguments;
+    fprintf(stdout, "Rum thread %i in process %i\n", args->id, getpid());
+
 
     float h, a, b;
     h = (args->b - args->a)/(float) args->tpt;
@@ -82,7 +84,7 @@ int main(int argc, char *argv[]) {
         x = 2*M_PI; x0 = 0;
     }
 
-    float unit = (x-x0)/(float) NTRAPEZOIDS;
+    float unit = (x-x0)/NTRAPEZOIDS;
     vector<int> tpt(NTHREADS, 0);
     split_in_box(NTRAPEZOIDS, NTHREADS, tpt.data());
 
