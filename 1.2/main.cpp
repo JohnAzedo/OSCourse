@@ -5,12 +5,6 @@
 #include <vector>
 #include <unistd.h>
 
-#define PI 3.14159265358979323846
-
-// Temp vars
-#define NTHREADS 7
-#define NTRAPEZOIDS 200
-
 using namespace std;
 
 //x0 = 0 and x = 2pi
@@ -34,19 +28,18 @@ void split_in_box(int h, int num_threads, int * array){
     }
 }
 
-float f1_sum = 0;
-float f2_sum = 0;
+float sum = 0;
 
 struct Arguments {
     int id;
-    // Trapezoids per thread
     int tpt;
     float a;
     float b;
+    pid_t process;
 };
 
 
-void * f1_in_thread(void* arguments){
+void * in_thread(void* arguments){
     auto *args = (Arguments *) arguments;
 
     float h, a, b;
@@ -54,7 +47,13 @@ void * f1_in_thread(void* arguments){
     a = args->a; b = h;
 
     for(int i=0; i<args->tpt; i++){
-        f1_sum += (h/2)*(f1(a)+f1(b));
+        if(args->process > 0){
+            sum += (h/2)*(f1(a)+f1(b));
+        }
+
+        if(args->process == 0){
+            sum += (h/2)*(f2(a)+f2(b));
+        }
         a = b;
         b += h;
     }
@@ -63,46 +62,60 @@ void * f1_in_thread(void* arguments){
 }
 
 
-int main() {
-    float x, x0; x = 10; x0 = 0;
+int main(int argc, char *argv[]) {
+    float x, x0;
+    const int NTHREADS = atoi(argv[1]);
+    const int NTRAPEZOIDS = atoi(argv[2]);
 
+    pid_t pid = fork();
     pthread_t threads[NTHREADS];
     void* thread_return;
     int status;
 
-    int trapezoids_per_unit = floor(NTRAPEZOIDS/(x-x0));
-    vector<int> array(NTHREADS, 0);
-    split_in_box(10, NTHREADS, array.data());
+    // Func 1
+    if(pid>0){
+        x = 10; x0 = 0;
+    }
+
+    // Func 2
+    if(pid == 0){
+        x = 2*M_PI; x0 = 0;
+    }
+
+    float unit = (x-x0)/(float) NTRAPEZOIDS;
+    vector<int> tpt(NTHREADS, 0);
+    split_in_box(NTRAPEZOIDS, NTHREADS, tpt.data());
 
     Arguments args{
-            0,0,0,0
+            0,0,0,0, pid
     };
 
     vector<Arguments> args_array(NTHREADS);
     for(int i=0; i<NTHREADS; i++){
         args.id = i;
-        args.tpt = array[i]*trapezoids_per_unit;
-        args.b += array[i];
+        args.tpt = tpt[i];
+        args.b += unit*tpt[i];
         args_array[i] = args;
         args.a = args.b;
     }
 
     for(int i=0; i<NTHREADS; i++){
-        status = pthread_create(&threads[i], nullptr, f1_in_thread, (void*) &args_array[i]);
+        status = pthread_create(&threads[i], nullptr, in_thread, (void*) &args_array[i]);
 
         if(status!=0){
             fprintf(stdout, "Error");
-            return status;
+            return 1;
         }
-
     }
 
     for(int i=0; i<NTHREADS; i++){
         pthread_join(threads[i], &thread_return);
-        fprintf(stdout,"Finish thread %i\n", i);
     }
 
-    fprintf(stdout, "Soma: %.2f", f1_sum);
-
+    if(pid>0){
+        fprintf(stdout, "Func1 area: %.2f\n", sum);
+    }else{
+        fprintf(stdout, "Func2 area: %.2f\n", sum);
+    }
     return 0;
 }
