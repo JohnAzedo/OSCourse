@@ -114,6 +114,7 @@ int main(int argc, char *argv[]) {
         pthread_join(threads[i], &thread_return);
     }
 
+    sleep(1);
     if(pid>0){
         fprintf(stdout, "Func1 area: %.2f\n", sum);
     }else{
