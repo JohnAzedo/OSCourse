@@ -6,3 +6,4 @@ Code | Description
 |---|---|
 `1.1` | Create a family tree usign process forks 
 `1.2` | Find integral area with PThreads
+`2.1` | Critical locals
